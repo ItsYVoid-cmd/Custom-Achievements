@@ -25,6 +25,7 @@ void createAchievementFile() {
     auto path = Mod::get()->getConfigDir() / "achievements.json";
 
     std::error_code ec;
+
     if (std::filesystem::exists(path, ec))
         return;
 
@@ -33,7 +34,7 @@ void createAchievementFile() {
         return;
     }
 
-    file::writeString(path, R"([
+    auto result = file::writeString(path, R"([
 {
     "title": "Hello!",
     "icon": 10,
@@ -45,6 +46,9 @@ void createAchievementFile() {
     "type": "cube"
 }
 ])");
+
+    if (!result)
+        log::error("Failed to create achievements.json");
 }
 
 $on_game(Loaded) {
@@ -64,13 +68,13 @@ $on_game(Loaded) {
 
     listenForKeybindSettingPresses(
         "trigger-next",
-        [achievements](Keybind const&, bool down, bool repeat, double) mutable {
+        [achievements](Keybind const&, bool down, bool repeat, double) {
             if (!down || repeat)
                 return;
 
             static size_t current = 0;
 
-            auto& achievement =
+            auto const& achievement =
                 achievements[current++ % achievements.size()];
 
             auto title =
