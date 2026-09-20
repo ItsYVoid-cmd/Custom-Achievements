@@ -2,6 +2,7 @@
 #include <Geode/utils/file.hpp>
 #include <Geode/loader/GameEvent.hpp>
 #include <Geode/loader/SettingV3.hpp>
+#include <system_error>
 
 using namespace geode::prelude;
 
@@ -23,8 +24,14 @@ std::string iconFrame(std::string const& type, int id) {
 void createAchievementFile() {
     auto path = Mod::get()->getConfigDir() / "achievements.json";
 
-    if (std::filesystem::exists(path))
+    std::error_code ec;
+    if (std::filesystem::exists(path, ec))
         return;
+
+    if (ec) {
+        log::error("Failed to check achievements.json: {}", ec.message());
+        return;
+    }
 
     file::writeString(path, R"([
 {
@@ -43,27 +50,28 @@ void createAchievementFile() {
 $on_game(Loaded) {
     createAchievementFile();
 
+    auto result = file::readJson(
+        Mod::get()->getConfigDir() / "achievements.json"
+    );
+
+    if (!result)
+        return;
+
+    auto achievements = result.unwrap();
+
+    if (!achievements.isArray() || achievements.size() == 0)
+        return;
+
     listenForKeybindSettingPresses(
         "trigger-next",
-        [](Keybind const&, bool down, bool repeat, double) {
+        [achievements](Keybind const&, bool down, bool repeat, double) mutable {
             if (!down || repeat)
                 return;
 
             static size_t current = 0;
 
-            auto result = file::readJson(
-                Mod::get()->getConfigDir() / "achievements.json"
-            );
-
-            if (!result)
-                return;
-
-            auto json = result.unwrap();
-
-            if (!json.isArray() || json.size() == 0)
-                return;
-
-            auto& achievement = json[current++ % json.size()];
+            auto& achievement =
+                achievements[current++ % achievements.size()];
 
             auto title =
                 achievement.get<std::string>("title").unwrapOr("Achievement");
