@@ -1,0 +1,26 @@
+{
+	"geode": "5.10.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "itsyvoid.custom-achievements",
+	"name": "Custom Achievements",
+	"version": "v1.0.0",
+	"developer": "ItsYVoid",
+	"description": "This mod lets you customize achievements in-game you can presss \"T\" to play an achievement in order",
+	"dependencies": {
+		"geode.node-ids": ">=v1.23.3"
+	},
+	"settings": {
+    "trigger-next": {
+        "name": "Show Achievement",
+        "type": "keybind",
+        "default": "T",
+        "category": "universal"
+    }
+}
+}
+
