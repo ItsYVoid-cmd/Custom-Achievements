@@ -8,7 +8,7 @@
 	},
 	"id": "itsyvoid.custom-achievements",
 	"name": "Custom Achievements",
-	"version": "v1.0.0",
+	"version": "v1.0.6",
 	"developer": "ItsYVoid",
 	"description": "This mod lets you customize achievements in-game you can presss \"T\" to play an achievement in order",
 	"dependencies": {
